@@ -12,6 +12,12 @@ private const val FORMAT_NAME = "format"
 private const val FORMAT = "json"
 private const val NO_JSON_CALL_BACK = "nojsoncallback"
 private const val NO_JSON_VALUE = "1"
+private const val RADIUS = "radius"
+private const val RADIUS_VALUE = "32"
+private const val RADIUS_UNITS = "radius_units"
+private const val KM = "km"
+private const val EXTRAS = "extras"
+private const val URLS = "url_s"
 
 class PhotoInterceptor(val lat: String,val lon:String): Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -20,6 +26,9 @@ class PhotoInterceptor(val lat: String,val lon:String): Interceptor {
             .addQueryParameter(API_KEY_NAME, API_KEY)
             .addQueryParameter(LAT,lat)
             .addQueryParameter(LON,lon)
+            .addQueryParameter(RADIUS, RADIUS_VALUE)
+            .addQueryParameter(RADIUS_UNITS,KM)
+            .addQueryParameter(EXTRAS, URLS)
             .addQueryParameter(FORMAT_NAME,FORMAT )
             .addQueryParameter(NO_JSON_CALL_BACK, NO_JSON_VALUE )
             .build()

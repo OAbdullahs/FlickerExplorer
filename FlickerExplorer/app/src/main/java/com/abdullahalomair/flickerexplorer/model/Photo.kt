@@ -1,6 +1,7 @@
 package com.abdullahalomair.flickerexplorer.model
 
 import android.net.Uri
+import com.google.gson.annotations.SerializedName
 
 data class Photo (
     val id : String,
@@ -11,15 +12,8 @@ data class Photo (
     val title : String,
     val ispublic : Int,
     val isfriend : Int,
-    val isfamily : Int
+    val isfamily : Int,
+    @SerializedName("url_s") var url: String = "",
 ){
-    val photoLocalPageUri: Uri
-        get() {
-            return Uri.parse("https://www.flickr.com/photos/")
-                .buildUpon()
-                .appendPath(owner)
-                .appendPath(id)
-                .build()
 
-        }
 }

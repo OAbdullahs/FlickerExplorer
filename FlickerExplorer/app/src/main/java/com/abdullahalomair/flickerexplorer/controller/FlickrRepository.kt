@@ -1,8 +1,7 @@
-package com.abdullahalomair.flickerexplorer
+package com.abdullahalomair.flickerexplorer.controller
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import com.abdullahalomair.flickerexplorer.api.FlickrLocalResponse
 import com.abdullahalomair.flickerexplorer.api.webrequest.FlickrLocalFetcher
 import com.abdullahalomair.flickerexplorer.model.Photo
 

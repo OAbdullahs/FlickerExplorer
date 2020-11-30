@@ -1,8 +1,7 @@
-package com.abdullahalomair.flickerexplorer
+package com.abdullahalomair.flickerexplorer.controller
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -13,31 +12,27 @@ import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.ViewModelProvider
+import com.abdullahalomair.flickerexplorer.CallBacks
+import com.abdullahalomair.flickerexplorer.R
 import com.abdullahalomair.flickerexplorer.permissions.checkPermissions
 import com.abdullahalomair.flickerexplorer.permissions.isLocationEnabled
-import com.abdullahalomair.flickerexplorer.viewmodel.MainActivityViewModel
 import com.google.android.gms.location.*
 
 
 private const val PERMISSION_ID = 44
-class MainActivity : AppCompatActivity() {
-    private lateinit var mainActivityViewModel: MainActivityViewModel
+ const val LAT = "lat"
+ const val LON = "lon"
+class MainActivity : AppCompatActivity(), CallBacks {
     private lateinit var mFusedLocationClient:FusedLocationProviderClient
-    private  var lat:String = "24.755562"
-    private  var lon:String = "46.589584"
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
        mFusedLocationClient = LocationServices
             .getFusedLocationProviderClient(this)
-       mainActivityViewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
         getLastLocation()
-
-        mainActivityViewModel.fetchLocalPhotos(lat,lon).observe(this,{photos ->
-            Log.i("GG",photos.toString())
-        })
 
     }
 
@@ -73,15 +68,19 @@ class MainActivity : AppCompatActivity() {
             locationResult: LocationResult
         ) {
             val mLastLocation: Location = locationResult.lastLocation
-
-                lat = mLastLocation.latitude.toString()
-                lon = mLastLocation.longitude.toString()
+                //TODO
+               mLastLocation.latitude.toString()
+                mLastLocation.longitude.toString()
+            latAndLon(mLastLocation.latitude.toString(),
+                mLastLocation.longitude.toString())
 
         }
     }
 
+
     @SuppressLint("MissingPermission")
-    fun getLastLocation(){
+    fun getLastLocation() {
+
         if(checkPermissions(this)){
             if (isLocationEnabled(this)){
                 mFusedLocationClient
@@ -92,8 +91,8 @@ class MainActivity : AppCompatActivity() {
                             requestNewLocationData()
                         }
                         else{
-                            lat = result.latitude.toString()
-                            lon = result.longitude.toString()
+                            latAndLon(result.latitude.toString(),
+                                result.longitude.toString())
                         }
                     }
             }
@@ -111,6 +110,26 @@ class MainActivity : AppCompatActivity() {
         else{
             requestPermissions()
         }
+    }
+    private fun latAndLon(_lat:String,_lon:String) {
+        val currentFragment =
+                supportFragmentManager.findFragmentById(R.id.fragment_manager)
+        getLastLocation()
+
+        if (currentFragment == null){
+            val argument = Bundle()
+            argument.putString(LAT,_lat)
+            argument.putString(LON,_lon)
+
+            val toDoListMain = LocalPhotosFragment.newInstance().apply {
+                arguments = argument
+            }
+            supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.fragment_manager,toDoListMain)
+                    .commit()
+        }
+
 
     }
     @SuppressLint("MissingPermission")
@@ -126,7 +145,7 @@ class MainActivity : AppCompatActivity() {
 
         // setting LocationRequest
         // on FusedLocationClient
-        var mFusedLocationClient = LocationServices
+        val mFusedLocationClient = LocationServices
             .getFusedLocationProviderClient(this)
         mFusedLocationClient
             .requestLocationUpdates(
@@ -136,5 +155,10 @@ class MainActivity : AppCompatActivity() {
             )
 
     }
+
+    override fun callBacks(fragmentName: String) {
+        //TODO
+    }
+
 
 }

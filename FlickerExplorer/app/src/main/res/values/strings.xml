@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">FlickerExplorer</string>
+    <string name="turn_location">Please turn on your location…</string>
 </resources>

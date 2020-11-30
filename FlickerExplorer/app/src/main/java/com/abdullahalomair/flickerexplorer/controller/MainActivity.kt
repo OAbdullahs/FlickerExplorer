@@ -10,29 +10,68 @@ import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import com.abdullahalomair.flickerexplorer.CallBacks
+import com.abdullahalomair.flickerexplorer.*
 import com.abdullahalomair.flickerexplorer.R
 import com.abdullahalomair.flickerexplorer.permissions.checkPermissions
 import com.abdullahalomair.flickerexplorer.permissions.isLocationEnabled
 import com.google.android.gms.location.*
+import kotlin.math.exp
 
 
 private const val PERMISSION_ID = 44
- const val LAT = "lat"
- const val LON = "lon"
-class MainActivity : AppCompatActivity(), CallBacks {
+
+class MainActivity : AppCompatActivity() {
     private lateinit var mFusedLocationClient:FusedLocationProviderClient
+    private lateinit var explorerSearchButton: ImageView
+    private lateinit var localHomeButton: ImageView
+
+
+    private lateinit var latitude:String
+    private lateinit var longitude:String
 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        explorerSearchButton = findViewById(R.id.go_to_explorer_button)
+        localHomeButton = findViewById(R.id.go_to_local_button)
        mFusedLocationClient = LocationServices
             .getFusedLocationProviderClient(this)
         getLastLocation()
+
+
+        //Go to explorer Images
+        explorerSearchButton.setOnClickListener {
+            localHomeButton.setBackgroundResource(R.drawable.ic_home_white_empty)
+                val newFragment = PhotoExplorerFragment.newInstance()
+                supportFragmentManager
+                        .beginTransaction()
+                        .replace(R.id.fragment_manager,newFragment)
+                        .commit()
+
+        }
+
+        //Go To Local Images
+        localHomeButton.setOnClickListener {
+            val argument = Bundle()
+            argument.putString(LAT,latitude)
+            argument.putString(LON,longitude)
+            localHomeButton.setBackgroundResource(R.drawable.ic_home_white_filled)
+            val newFragment = LocalPhotosFragment.newInstance().apply {
+                arguments = argument
+            }
+            supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.fragment_manager,newFragment)
+                    .commit()
+        }
+
 
     }
 
@@ -68,7 +107,7 @@ class MainActivity : AppCompatActivity(), CallBacks {
             locationResult: LocationResult
         ) {
             val mLastLocation: Location = locationResult.lastLocation
-                //TODO
+
                mLastLocation.latitude.toString()
                 mLastLocation.longitude.toString()
             latAndLon(mLastLocation.latitude.toString(),
@@ -112,21 +151,22 @@ class MainActivity : AppCompatActivity(), CallBacks {
         }
     }
     private fun latAndLon(_lat:String,_lon:String) {
+
         val currentFragment =
                 supportFragmentManager.findFragmentById(R.id.fragment_manager)
-        getLastLocation()
 
         if (currentFragment == null){
             val argument = Bundle()
             argument.putString(LAT,_lat)
             argument.putString(LON,_lon)
-
+            latitude = _lat
+            longitude = _lon
             val toDoListMain = LocalPhotosFragment.newInstance().apply {
                 arguments = argument
             }
             supportFragmentManager
                     .beginTransaction()
-                    .replace(R.id.fragment_manager,toDoListMain)
+                    .add(R.id.fragment_manager,toDoListMain)
                     .commit()
         }
 
@@ -155,10 +195,4 @@ class MainActivity : AppCompatActivity(), CallBacks {
             )
 
     }
-
-    override fun callBacks(fragmentName: String) {
-        //TODO
-    }
-
-
 }

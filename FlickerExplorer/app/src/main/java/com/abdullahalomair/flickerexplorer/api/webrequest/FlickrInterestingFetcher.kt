@@ -7,6 +7,8 @@ import com.abdullahalomair.flickerexplorer.api.FlickrApi
 import com.abdullahalomair.flickerexplorer.api.FlickrInterestingResponse
 import com.abdullahalomair.flickerexplorer.api.PhotoInterestingResponse
 import com.abdullahalomair.flickerexplorer.api.exception.WrongUrlException
+import com.abdullahalomair.flickerexplorer.api.interceptors.InterestingPhotoInterceptor
+import com.abdullahalomair.flickerexplorer.api.interceptors.PhotoInterceptor
 import com.abdullahalomair.flickerexplorer.model.GalleryItem
 import okhttp3.OkHttpClient
 import retrofit2.Call
@@ -19,10 +21,13 @@ class FlickrInterestingFetcher {
     private val flickrApi: FlickrApi
 
     init {
+        val client = OkHttpClient.Builder()
+            .addInterceptor(InterestingPhotoInterceptor())
+            .build()
         val retrofit: Retrofit = Retrofit.Builder()
             .baseUrl("https://api.flickr.com/")
+            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
-
             .build()
 
         flickrApi = retrofit.create(FlickrApi::class.java)

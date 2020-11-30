@@ -1,15 +1,19 @@
-package com.abdullahalomair.flickerexplorer
+package com.abdullahalomair.flickerexplorer.controller
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import com.abdullahalomair.flickerexplorer.api.FlickrLocalResponse
+import com.abdullahalomair.flickerexplorer.api.webrequest.FlickrInterestingFetcher
 import com.abdullahalomair.flickerexplorer.api.webrequest.FlickrLocalFetcher
+import com.abdullahalomair.flickerexplorer.model.GalleryItem
 import com.abdullahalomair.flickerexplorer.model.Photo
 
 class FlickrRepository private constructor(context: Context){
 
     fun getLocalPhotos(lat:String, lon:String):LiveData<List<Photo>>{
         return FlickrLocalFetcher(lat,lon).fetchLocalPhotos()
+    }
+    fun getInterestingPhotos():LiveData<List<GalleryItem>> {
+        return FlickrInterestingFetcher().fetchInterestingPhotos()
     }
 
     companion object {

@@ -1,8 +1,7 @@
-package com.abdullahalomair.flickerexplorer
+package com.abdullahalomair.flickerexplorer.controller
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -11,33 +10,68 @@ import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.ViewModelProvider
+import com.abdullahalomair.flickerexplorer.*
+import com.abdullahalomair.flickerexplorer.R
 import com.abdullahalomair.flickerexplorer.permissions.checkPermissions
 import com.abdullahalomair.flickerexplorer.permissions.isLocationEnabled
-import com.abdullahalomair.flickerexplorer.viewmodel.MainActivityViewModel
 import com.google.android.gms.location.*
+import kotlin.math.exp
 
 
 private const val PERMISSION_ID = 44
+
 class MainActivity : AppCompatActivity() {
-    private lateinit var mainActivityViewModel: MainActivityViewModel
     private lateinit var mFusedLocationClient:FusedLocationProviderClient
-    private  var lat:String = "24.755562"
-    private  var lon:String = "46.589584"
+    private lateinit var explorerSearchButton: ImageView
+    private lateinit var localHomeButton: ImageView
+
+
+    private lateinit var latitude:String
+    private lateinit var longitude:String
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        explorerSearchButton = findViewById(R.id.go_to_explorer_button)
+        localHomeButton = findViewById(R.id.go_to_local_button)
        mFusedLocationClient = LocationServices
             .getFusedLocationProviderClient(this)
-       mainActivityViewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
         getLastLocation()
 
-        mainActivityViewModel.fetchLocalPhotos(lat,lon).observe(this,{photos ->
-            Log.i("GG",photos.toString())
-        })
+
+        //Go to explorer Images
+        explorerSearchButton.setOnClickListener {
+            localHomeButton.setBackgroundResource(R.drawable.ic_home_white_empty)
+                val newFragment = PhotoExplorerFragment.newInstance()
+                supportFragmentManager
+                        .beginTransaction()
+                        .replace(R.id.fragment_manager,newFragment)
+                        .commit()
+
+        }
+
+        //Go To Local Images
+        localHomeButton.setOnClickListener {
+            val argument = Bundle()
+            argument.putString(LAT,latitude)
+            argument.putString(LON,longitude)
+            localHomeButton.setBackgroundResource(R.drawable.ic_home_white_filled)
+            val newFragment = LocalPhotosFragment.newInstance().apply {
+                arguments = argument
+            }
+            supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.fragment_manager,newFragment)
+                    .commit()
+        }
+
 
     }
 
@@ -74,14 +108,18 @@ class MainActivity : AppCompatActivity() {
         ) {
             val mLastLocation: Location = locationResult.lastLocation
 
-                lat = mLastLocation.latitude.toString()
-                lon = mLastLocation.longitude.toString()
+               mLastLocation.latitude.toString()
+                mLastLocation.longitude.toString()
+            latAndLon(mLastLocation.latitude.toString(),
+                mLastLocation.longitude.toString())
 
         }
     }
 
+
     @SuppressLint("MissingPermission")
-    fun getLastLocation(){
+    fun getLastLocation() {
+
         if(checkPermissions(this)){
             if (isLocationEnabled(this)){
                 mFusedLocationClient
@@ -92,8 +130,8 @@ class MainActivity : AppCompatActivity() {
                             requestNewLocationData()
                         }
                         else{
-                            lat = result.latitude.toString()
-                            lon = result.longitude.toString()
+                            latAndLon(result.latitude.toString(),
+                                result.longitude.toString())
                         }
                     }
             }
@@ -111,6 +149,27 @@ class MainActivity : AppCompatActivity() {
         else{
             requestPermissions()
         }
+    }
+    private fun latAndLon(_lat:String,_lon:String) {
+
+        val currentFragment =
+                supportFragmentManager.findFragmentById(R.id.fragment_manager)
+
+        if (currentFragment == null){
+            val argument = Bundle()
+            argument.putString(LAT,_lat)
+            argument.putString(LON,_lon)
+            latitude = _lat
+            longitude = _lon
+            val toDoListMain = LocalPhotosFragment.newInstance().apply {
+                arguments = argument
+            }
+            supportFragmentManager
+                    .beginTransaction()
+                    .add(R.id.fragment_manager,toDoListMain)
+                    .commit()
+        }
+
 
     }
     @SuppressLint("MissingPermission")
@@ -126,7 +185,7 @@ class MainActivity : AppCompatActivity() {
 
         // setting LocationRequest
         // on FusedLocationClient
-        var mFusedLocationClient = LocationServices
+        val mFusedLocationClient = LocationServices
             .getFusedLocationProviderClient(this)
         mFusedLocationClient
             .requestLocationUpdates(
@@ -136,5 +195,4 @@ class MainActivity : AppCompatActivity() {
             )
 
     }
-
 }

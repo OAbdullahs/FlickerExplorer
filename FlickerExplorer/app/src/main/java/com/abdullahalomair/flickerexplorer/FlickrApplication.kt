@@ -11,6 +11,6 @@ class FlickrApplication: Application() {
 
     override fun onCreate() {
         super.onCreate()
-
+        FlickrRepository.initialize(this)
     }
 }

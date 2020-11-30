@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
@@ -23,6 +24,8 @@ private const val PERMISSION_ID = 44
 class MainActivity : AppCompatActivity() {
     private lateinit var mainActivityViewModel: MainActivityViewModel
     private lateinit var mFusedLocationClient:FusedLocationProviderClient
+    private  var lat:String = "24.755562"
+    private  var lon:String = "46.589584"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +34,10 @@ class MainActivity : AppCompatActivity() {
             .getFusedLocationProviderClient(this)
        mainActivityViewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
         getLastLocation()
+
+        mainActivityViewModel.fetchLocalPhotos(lat,lon).observe(this,{photos ->
+            Log.i("GG",photos.toString())
+        })
 
     }
 
@@ -50,8 +57,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    // method to requestfor permissions
-     fun requestPermissions() {
+    // method to request for permissions
+     private fun requestPermissions() {
         ActivityCompat.requestPermissions(
             this, arrayOf(
                 Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -66,9 +73,10 @@ class MainActivity : AppCompatActivity() {
             locationResult: LocationResult
         ) {
             val mLastLocation: Location = locationResult.lastLocation
-            updateLocation(
-                mLastLocation.latitude.toString(), mLastLocation.longitude.toString()
-            )
+
+                lat = mLastLocation.latitude.toString()
+                lon = mLastLocation.longitude.toString()
+
         }
     }
 
@@ -84,12 +92,8 @@ class MainActivity : AppCompatActivity() {
                             requestNewLocationData()
                         }
                         else{
-                            Toast.makeText(
-                                this,
-                                result.latitude.toString()
-                                        + result.longitude,
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            lat = result.latitude.toString()
+                            lon = result.longitude.toString()
                         }
                     }
             }
@@ -133,7 +137,4 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun updateLocation(lat: String, long: String){
-        Toast.makeText(this, long + lat, Toast.LENGTH_SHORT).show()
-    }
 }

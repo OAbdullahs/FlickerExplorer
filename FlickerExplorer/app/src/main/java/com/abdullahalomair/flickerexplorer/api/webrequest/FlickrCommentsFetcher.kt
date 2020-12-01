@@ -52,9 +52,10 @@ class FlickrCommentsFetcher(private val photoId:String) {
             override fun onResponse(call: Call<FlickrCommentsResponse>, response: Response<FlickrCommentsResponse>) {
 
                 val flickrResponse: FlickrCommentsResponse? = response.body()
-                val commentList: List<Comment> = flickrResponse?.comments?.comment
+                val photoResponse: CommentResponse? = flickrResponse?.comments
+                val commentList: List<Comment> = photoResponse?.comment
                     ?: mutableListOf()
-
+                    Log.i(TAG,commentList.toString())
                 responseLiveData.value = commentList
             }
         })

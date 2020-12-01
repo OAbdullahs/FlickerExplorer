@@ -1,8 +1,9 @@
 package com.abdullahalomair.flickerexplorer.api
 
 import com.abdullahalomair.flickerexplorer.model.Comment
+import com.google.gson.annotations.SerializedName
 
 class CommentResponse {
-
-    lateinit var comment: List<Comment>
+    @SerializedName("comment")
+    var comment: List<Comment> = emptyList()
 }

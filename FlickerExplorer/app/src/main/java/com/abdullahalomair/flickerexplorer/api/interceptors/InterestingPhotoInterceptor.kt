@@ -1,5 +1,6 @@
 package com.abdullahalomair.flickerexplorer.api.interceptors
 
+import android.util.Log
 import okhttp3.HttpUrl
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -11,7 +12,7 @@ private const val FORMAT = "json"
 private const val NO_JSON_CALL_BACK = "nojsoncallback"
 private const val NO_JSON_VALUE = "1"
 private const val EXTRAS = "extras"
-private const val URLS = "url_s"
+private const val URLS = "url_c"
 class InterestingPhotoInterceptor: Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest: Request = chain.request()

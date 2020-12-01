@@ -15,18 +15,19 @@
         app:cardElevation="5dp"
         android:layout_margin="5dp"
         >
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <ImageView
                 android:id="@+id/expanded_photo"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginEnd="40dp"
+                android:layout_marginBottom="40dp"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -39,24 +40,44 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/expanded_photo"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.81"
                 app:srcCompat="@drawable/ic_favorite_border_white" />
 
             <TextView
                 android:id="@+id/photo_title"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="wrap_content"
+                android:layout_height="22dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
                 android:paddingStart="2dp"
                 android:paddingEnd="2dp"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@+id/expanded_photo"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/expanded_photo"
-                app:layout_constraintTop_toBottomOf="@+id/favorite_image" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/comment_image"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="@+id/favorite_image"
+                app:layout_constraintTop_toBottomOf="@+id/favorite_image"
+                app:srcCompat="@drawable/ic_comment_white_24dp" />
+
+            <TextView
+                android:id="@+id/replies_counter"
+                android:layout_width="0dp"
+                android:layout_height="20dp"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="@+id/comment_image"
+                app:layout_constraintStart_toStartOf="@+id/comment_image"
+                app:layout_constraintTop_toBottomOf="@+id/comment_image" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>

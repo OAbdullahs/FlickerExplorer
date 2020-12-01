@@ -1,6 +1,5 @@
 package com.abdullahalomair.flickerexplorer.api.webrequest
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.abdullahalomair.flickerexplorer.api.FlickrApi
@@ -8,7 +7,6 @@ import com.abdullahalomair.flickerexplorer.api.FlickrInterestingResponse
 import com.abdullahalomair.flickerexplorer.api.PhotoInterestingResponse
 import com.abdullahalomair.flickerexplorer.api.exception.WrongUrlException
 import com.abdullahalomair.flickerexplorer.api.interceptors.InterestingPhotoInterceptor
-import com.abdullahalomair.flickerexplorer.api.interceptors.PhotoInterceptor
 import com.abdullahalomair.flickerexplorer.model.GalleryItem
 import okhttp3.OkHttpClient
 import retrofit2.Call

@@ -2,8 +2,10 @@ package com.abdullahalomair.flickerexplorer.controller
 
 import android.content.Context
 import androidx.lifecycle.LiveData
+import com.abdullahalomair.flickerexplorer.api.webrequest.FlickrCommentsFetcher
 import com.abdullahalomair.flickerexplorer.api.webrequest.FlickrInterestingFetcher
 import com.abdullahalomair.flickerexplorer.api.webrequest.FlickrLocalFetcher
+import com.abdullahalomair.flickerexplorer.model.Comment
 import com.abdullahalomair.flickerexplorer.model.GalleryItem
 import com.abdullahalomair.flickerexplorer.model.Photo
 
@@ -14,6 +16,9 @@ class FlickrRepository private constructor(context: Context){
     }
     fun getInterestingPhotos():LiveData<List<GalleryItem>> {
         return FlickrInterestingFetcher().fetchInterestingPhotos()
+    }
+    fun getPhotoComments(photoId:String): LiveData<List<Comment>>{
+        return FlickrCommentsFetcher(photoId).fetchPhotoComments()
     }
 
     companion object {

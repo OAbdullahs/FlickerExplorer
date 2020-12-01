@@ -11,14 +11,13 @@ private const val FORMAT_NAME = "format"
 private const val FORMAT = "json"
 private const val NO_JSON_CALL_BACK = "nojsoncallback"
 private const val NO_JSON_VALUE = "1"
-private const val EXTRAS = "extras"
-private const val URLS = "url_c"
-class InterestingPhotoInterceptor: Interceptor {
+private const val PHOTO_ID = "photo_id"
+class CommentInterceptor(private val photoId:String):Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest: Request = chain.request()
         val newUrl: HttpUrl = originalRequest.url().newBuilder()
             .addQueryParameter(API_KEY_NAME, API_KEY)
-            .addQueryParameter(EXTRAS, URLS)
+            .addQueryParameter(PHOTO_ID, photoId)
             .addQueryParameter(FORMAT_NAME,FORMAT )
             .addQueryParameter(NO_JSON_CALL_BACK, NO_JSON_VALUE )
             .build()

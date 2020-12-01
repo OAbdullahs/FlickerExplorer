@@ -3,7 +3,6 @@ package com.abdullahalomair.flickerexplorer.controller
 import android.location.Address
 import android.location.Geocoder
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

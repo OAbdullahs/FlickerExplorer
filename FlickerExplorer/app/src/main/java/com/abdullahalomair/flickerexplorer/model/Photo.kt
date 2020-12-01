@@ -13,7 +13,5 @@ data class Photo (
     val ispublic : Int,
     val isfriend : Int,
     val isfamily : Int,
-    @SerializedName("url_s") var url: String = "",
-){
-
-}
+    @SerializedName("url_c") var url: String = "",
+)

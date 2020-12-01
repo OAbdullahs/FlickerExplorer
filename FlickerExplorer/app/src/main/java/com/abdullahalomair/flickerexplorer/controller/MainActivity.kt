@@ -4,14 +4,12 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.drawable.TransitionDrawable
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
-import android.util.Log
-import android.widget.Button
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -31,6 +29,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var localHomeButton: ImageView
 
 
+
     private lateinit var latitude:String
     private lateinit var longitude:String
 
@@ -39,6 +38,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        //Home Images
+         val notFilledHome = this.getDrawable(R.drawable.ic_home_white_empty)
+         val filledHome = this.getDrawable(R.drawable.ic_home_white_filled)
         explorerSearchButton = findViewById(R.id.go_to_explorer_button)
         localHomeButton = findViewById(R.id.go_to_local_button)
        mFusedLocationClient = LocationServices
@@ -48,7 +50,7 @@ class MainActivity : AppCompatActivity() {
 
         //Go to explorer Images
         explorerSearchButton.setOnClickListener {
-            localHomeButton.setBackgroundResource(R.drawable.ic_home_white_empty)
+            localHomeButton.setImageDrawable(notFilledHome)
                 val newFragment = PhotoExplorerFragment.newInstance()
                 supportFragmentManager
                         .beginTransaction()
@@ -62,7 +64,9 @@ class MainActivity : AppCompatActivity() {
             val argument = Bundle()
             argument.putString(LAT,latitude)
             argument.putString(LON,longitude)
-            localHomeButton.setBackgroundResource(R.drawable.ic_home_white_filled)
+
+            localHomeButton.setImageDrawable(filledHome)
+
             val newFragment = LocalPhotosFragment.newInstance().apply {
                 arguments = argument
             }

@@ -17,7 +17,7 @@ private const val RADIUS_VALUE = "32"
 private const val RADIUS_UNITS = "radius_units"
 private const val KM = "km"
 private const val EXTRAS = "extras"
-private const val URLS = "url_s"
+private const val URLS = "url_c"
 
 class PhotoInterceptor(val lat: String,val lon:String): Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {

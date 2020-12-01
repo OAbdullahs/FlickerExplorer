@@ -10,4 +10,7 @@ interface FlickrApi {
 
     @GET("services/rest/?method=flickr.photos.search")
     fun fetchLocalPhotos(): Call<FlickrLocalResponse>
+
+    @GET("services/rest/?method=flickr.photos.comments.getList")
+    fun fetchPhotoComments(): Call<FlickrCommentsResponse>
 }

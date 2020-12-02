@@ -3,4 +3,5 @@
     <string name="explorer">FlickrExplorer</string>
     <string name="turn_location">Please turn on your location…</string>
     <string name="search_hint">Enter the country name</string>
+    <string name="no_liked_photos">You haven\'t liked any photo yet!!!</string>
 </resources>

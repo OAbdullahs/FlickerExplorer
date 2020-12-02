@@ -13,7 +13,7 @@ class PhotoLocalAdapter(private val getActivity: Activity,private val context: C
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoHolder {
         val view = LayoutInflater.from(context)
             .inflate(
-                R.layout.display_photos, parent, false
+                R.layout.activity_display_photos, parent, false
             )
         return PhotoHolder(view)
     }

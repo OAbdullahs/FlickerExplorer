@@ -39,8 +39,7 @@ class PhotoExplorerFragment: Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.explorer_fragment, container, false)
 
-        //Change actionBar title
-        activity?.title = context?.getText(R.string.explorer)
+
 
         searchCityEditText = view.findViewById(R.id.search_city_by_name)
         searchCityAdapter = ArrayAdapter(
@@ -51,7 +50,7 @@ class PhotoExplorerFragment: Fragment() {
         searchCityEditText.setAdapter(searchCityAdapter)
 
         searchCityEditText.setOnItemClickListener { parent, view, position, id ->
-
+        //TODO
 
         }
 

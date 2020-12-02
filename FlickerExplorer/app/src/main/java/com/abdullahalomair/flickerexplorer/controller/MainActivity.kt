@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.TransitionDrawable
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +16,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.abdullahalomair.flickerexplorer.*
 import com.abdullahalomair.flickerexplorer.R
+import com.abdullahalomair.flickerexplorer.model.HomeButtons
 import com.abdullahalomair.flickerexplorer.permissions.checkPermissions
 import com.abdullahalomair.flickerexplorer.permissions.isLocationEnabled
 import com.google.android.gms.location.*
@@ -27,7 +29,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mFusedLocationClient:FusedLocationProviderClient
     private lateinit var explorerSearchButton: ImageView
     private lateinit var localHomeButton: ImageView
-
+    private lateinit var favoriteButton:  ImageView
+    private lateinit var notFilledHome: Drawable
+    private lateinit var filledHome: Drawable
+    private lateinit var notFillFavorite: Drawable
+    private lateinit var fillFavorite: Drawable
 
 
     private lateinit var latitude:String
@@ -35,14 +41,19 @@ class MainActivity : AppCompatActivity() {
 
 
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         //Home Images
-         val notFilledHome = this.getDrawable(R.drawable.ic_home_white_empty)
-         val filledHome = this.getDrawable(R.drawable.ic_home_white_filled)
+          notFilledHome = this.getDrawable(R.drawable.ic_home_white_empty)!!
+          filledHome = this.getDrawable(R.drawable.ic_home_white_filled)!!
+          notFillFavorite = this.getDrawable(R.drawable.ic_favorite_border_white)!!
+          fillFavorite = this.getDrawable(R.drawable.ic_favorite_white_filled)!!
+
         explorerSearchButton = findViewById(R.id.go_to_explorer_button)
         localHomeButton = findViewById(R.id.go_to_local_button)
+        favoriteButton = findViewById(R.id.go_to_setting_button)
        mFusedLocationClient = LocationServices
             .getFusedLocationProviderClient(this)
         getLastLocation()
@@ -50,7 +61,7 @@ class MainActivity : AppCompatActivity() {
 
         //Go to explorer Images
         explorerSearchButton.setOnClickListener {
-            localHomeButton.setImageDrawable(notFilledHome)
+            changeHomePageImages(HomeButtons.EXPLORER)
                 val newFragment = PhotoExplorerFragment.newInstance()
                 supportFragmentManager
                         .beginTransaction()
@@ -58,14 +69,21 @@ class MainActivity : AppCompatActivity() {
                         .commit()
 
         }
+        favoriteButton.setOnClickListener {
+            changeHomePageImages(HomeButtons.FAVORITE)
+            val newFragment = LikedPhotosFragment.newInstance()
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.fragment_manager,newFragment)
+                .commit()
+        }
 
         //Go To Local Images
         localHomeButton.setOnClickListener {
+            changeHomePageImages(HomeButtons.LOCAL)
             val argument = Bundle()
             argument.putString(LAT,latitude)
             argument.putString(LON,longitude)
-
-            localHomeButton.setImageDrawable(filledHome)
 
             val newFragment = LocalPhotosFragment.newInstance().apply {
                 arguments = argument
@@ -77,8 +95,25 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+
     }
 
+    private fun changeHomePageImages(homeButtons: HomeButtons){
+        when(homeButtons){
+            HomeButtons.LOCAL ->{
+                localHomeButton.setImageDrawable(filledHome)
+                favoriteButton.setImageDrawable(notFillFavorite)
+            }
+            HomeButtons.FAVORITE ->{
+                favoriteButton.setImageDrawable(fillFavorite)
+                localHomeButton.setImageDrawable(notFilledHome)
+            }
+            HomeButtons.EXPLORER ->{
+                localHomeButton.setImageDrawable(notFilledHome)
+                favoriteButton.setImageDrawable(notFillFavorite)
+            }
+        }
+    }
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,

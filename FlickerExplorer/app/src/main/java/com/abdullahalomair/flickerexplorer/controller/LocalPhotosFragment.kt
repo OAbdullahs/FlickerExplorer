@@ -55,8 +55,8 @@ private lateinit var progressBar: ProgressBar
 
         val bundle = this.arguments
         if (bundle != null) {
-             lat =  bundle.getString(LAT, "")
-             lon = bundle.getString(LON, "")
+             val lat =  bundle.getString(LAT, "")
+             val lon = bundle.getString(LON, "")
             activity?.title = getCityName(lat, lon)
             localPhotosViewModel.fetchLocalPhotos(lat, lon).observe(
                 viewLifecycleOwner, { photos ->
@@ -71,6 +71,12 @@ private lateinit var progressBar: ProgressBar
         return view
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        //Change actionBar title
+        activity?.title = context?.getText(R.string.explorer)
+    }
+
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
@@ -78,15 +84,8 @@ private lateinit var progressBar: ProgressBar
     }
 
 companion object{
-    private var lat:String = ""
-    private var lon:String = ""
     fun newInstance(): LocalPhotosFragment {
-        val argument = Bundle()
-        argument.putString(LAT,lat)
-        argument.putString(LON,lon)
-        return LocalPhotosFragment().apply {
-            arguments = argument
-        }
+        return LocalPhotosFragment()
     }
 }
 }

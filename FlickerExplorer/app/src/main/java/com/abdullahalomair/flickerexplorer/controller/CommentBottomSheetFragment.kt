@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +19,7 @@ class CommentBottomSheetFragment(private val comments:List<Comment>)
     : BottomSheetDialogFragment() {
     private lateinit var bottomSheetRecyclerView: RecyclerView
     private lateinit var adapter: BottomSheetAdapter
+    private lateinit var noCommentTextView: TextView
 
 
 
@@ -28,11 +30,18 @@ class CommentBottomSheetFragment(private val comments:List<Comment>)
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.bottom_sheet_modal, container, false)
-
+        noCommentTextView = view.findViewById(R.id.no_comments_massage)
         bottomSheetRecyclerView = view.findViewById(R.id.bottom_sheet_recyclerview)
-        bottomSheetRecyclerView.layoutManager = LinearLayoutManager(context)
-        adapter = BottomSheetAdapter(context!!, comments)
-        bottomSheetRecyclerView.adapter = adapter
+        if (comments.isEmpty()){
+            bottomSheetRecyclerView.visibility = View.GONE
+            noCommentTextView.visibility = View.VISIBLE
+        }else {
+            bottomSheetRecyclerView.visibility = View.VISIBLE
+            noCommentTextView.visibility = View.GONE
+            bottomSheetRecyclerView.layoutManager = LinearLayoutManager(context)
+            adapter = BottomSheetAdapter(context!!, comments)
+            bottomSheetRecyclerView.adapter = adapter
+        }
 
 
         return view

@@ -107,10 +107,14 @@ class MainActivity : AppCompatActivity() {
             HomeButtons.FAVORITE ->{
                 favoriteButton.setImageDrawable(fillFavorite)
                 localHomeButton.setImageDrawable(notFilledHome)
+                //Change actionBar title
+                this.title = this.getText(R.string.explorer)
             }
             HomeButtons.EXPLORER ->{
                 localHomeButton.setImageDrawable(notFilledHome)
                 favoriteButton.setImageDrawable(notFillFavorite)
+                //Change actionBar title
+                this.title = this.getText(R.string.explorer)
             }
         }
     }

@@ -71,21 +71,15 @@ private lateinit var progressBar: ProgressBar
         return view
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        //Change actionBar title
-        activity?.title = context?.getText(R.string.explorer)
-    }
-
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
         onCreate(savedInstanceState)
     }
 
-companion object{
-    fun newInstance(): LocalPhotosFragment {
-        return LocalPhotosFragment()
-    }
+    companion object{
+        fun newInstance(): LocalPhotosFragment {
+            return LocalPhotosFragment()
+        }
 }
 }

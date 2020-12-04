@@ -1,21 +1,29 @@
 package com.abdullahalomair.flickerexplorer.controller
 
+import android.app.Activity
+import android.location.Address
+import android.location.Geocoder
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.abdullahalomair.flickerexplorer.R
-import com.abdullahalomair.flickerexplorer.countries
+import com.abdullahalomair.flickerexplorer.model.Cities
 import com.abdullahalomair.flickerexplorer.viewmodel.PhotoExplorerFragmentViewModel
-import com.google.gson.reflect.TypeToken
-import org.json.JSONException
+import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.IOException
-import java.lang.reflect.Type
+import java.util.*
+
 
 class PhotoExplorerFragment: Fragment() {
     private lateinit var photoExplorerViewModel: PhotoExplorerFragmentViewModel
@@ -33,42 +41,89 @@ class PhotoExplorerFragment: Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.explorer_fragment, container, false)
-
-
-
         searchCityEditText = view.findViewById(R.id.search_city_by_name)
-        searchCityAdapter = ArrayAdapter(
-            context!!,
-            R.layout.simple_dropdown_item,
-            R.id.autoComplete, countries
-        )
-        searchCityEditText.setAdapter(searchCityAdapter)
-
-        searchCityEditText.setOnItemClickListener { parent, view, position, id ->
-        //TODO
-
-        }
-
         photosRecyclerView = view.findViewById(R.id.interesting_recyclerView)
         progressBar = view.findViewById(R.id.explorer_progress)
         photosRecyclerView.layoutManager = GridLayoutManager(context, 3)
 
+       CoroutineScope(Dispatchers.Main).launch {
+           searchCityAdapter = ArrayAdapter(
+                   context!!,
+                   R.layout.simple_dropdown_item,
+                   R.id.autoComplete, getAllCitiesNames()
+           )
+           searchCityEditText.setAdapter(searchCityAdapter)
+       }
+
+
+
+
+
+
+        searchCityEditText.setOnItemClickListener { parent, _, position, _ ->
+            val getCityName: String = parent.getItemAtPosition(position).toString()
+            displayPhotoBySearch(getCityName)
+            searchCityEditText.text.clear()
+            val imm = context?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager?
+            imm?.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
+        }
+
         photosRecyclerView.visibility = View.GONE
         progressBar.visibility = View.VISIBLE
         photoExplorerViewModel.getInterestingPhotos().observe(
-            viewLifecycleOwner, { galleryItems ->
-                photoInterestingAdapter = PhotoInterestingAdapter(activity!!,context!!, galleryItems)
-                photosRecyclerView.adapter = photoInterestingAdapter
-                photosRecyclerView.visibility = View.VISIBLE
-                progressBar.visibility = View.GONE
-            }
+                viewLifecycleOwner, { galleryItems ->
+            photoInterestingAdapter = PhotoInterestingAdapter(activity!!, context!!, galleryItems)
+            photosRecyclerView.adapter = photoInterestingAdapter
+            photosRecyclerView.visibility = View.VISIBLE
+            progressBar.visibility = View.GONE
+        }
         )
         return view
+    }
+
+    private fun displayPhotoBySearch(getCityName:String){
+        val gc = Geocoder(context, Locale.getDefault())
+        val address: List<Address> = gc.getFromLocationName(getCityName, 1)
+        if (address[0].hasLatitude() && address[0].hasLongitude()) {
+            val longitude = address[0].longitude
+            val latitude = address[0].latitude
+
+            photosRecyclerView.visibility = View.GONE
+            progressBar.visibility = View.VISIBLE
+            photoExplorerViewModel.getSearchedBasedPhotos(latitude.toString(), longitude.toString())
+                .observe(
+                    viewLifecycleOwner, { searchedPhotos ->
+                        activity?.title = getCityName
+                        photoInterestingAdapter =
+                            PhotoInterestingAdapter(activity!!, context!!, photos = searchedPhotos)
+                        photosRecyclerView.adapter = photoInterestingAdapter
+                        photosRecyclerView.visibility = View.VISIBLE
+                        progressBar.visibility = View.GONE
+                    }
+                )
+        }
+    }
+
+    private suspend fun getJsonDataFromAsset(fileName: String): String? {
+        val jsonString: String
+        try {
+            jsonString = context?.assets?.open(fileName)?.bufferedReader().use { it?.readText() ?: "" }
+        } catch (ioException: IOException) {
+            ioException.printStackTrace()
+            return null
+        }
+        return jsonString
+    }
+    private suspend fun getAllCitiesNames():List<String>{
+        val jsonFileString = getJsonDataFromAsset("cities.json")
+        val gson = Gson()
+        val allCities: Cities = gson.fromJson(jsonFileString, Cities::class.java)
+        return allCities.cities
     }
 
 

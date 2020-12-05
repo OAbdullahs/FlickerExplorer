@@ -18,7 +18,7 @@ import com.abdullahalomair.flickerexplorer.viewmodel.DisplayPhotoViewModel
 import com.bumptech.glide.Glide
 
 private const val SHEET_TAG = "BottomSheetDialogFragment"
-class DisplayPhoto : AppCompatActivity() {
+class DisplayPhotoActivity : AppCompatActivity() {
     private val displayPhotoViewModel: DisplayPhotoViewModel by lazy {
         ViewModelProvider(this).get(DisplayPhotoViewModel::class.java)
     }

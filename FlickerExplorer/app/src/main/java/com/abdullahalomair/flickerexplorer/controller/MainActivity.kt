@@ -2,6 +2,7 @@ package com.abdullahalomair.flickerexplorer.controller
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
@@ -82,8 +83,12 @@ class MainActivity : AppCompatActivity() {
         localHomeButton.setOnClickListener {
             changeHomePageImages(HomeButtons.LOCAL)
             val argument = Bundle()
-            argument.putString(LAT,latitude)
-            argument.putString(LON,longitude)
+            try {
+                argument.putString(LAT, latitude)
+                argument.putString(LON, longitude)
+            }catch (e:UninitializedPropertyAccessException){
+                getLastLocation()
+            }
 
             val newFragment = LocalPhotosFragment.newInstance().apply {
                 arguments = argument
@@ -129,11 +134,11 @@ class MainActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty()
                 && grantResults[0]
                 == PackageManager.PERMISSION_GRANTED) {
-
                getLastLocation()
             }
         }
     }
+
     // method to request for permissions
      private fun requestPermissions() {
         ActivityCompat.requestPermissions(

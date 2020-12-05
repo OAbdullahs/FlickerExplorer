@@ -57,10 +57,12 @@ private lateinit var progressBar: ProgressBar
         if (bundle != null) {
              val lat =  bundle.getString(LAT, "")
              val lon = bundle.getString(LON, "")
+            try {
             activity?.title = getCityName(lat, lon)
+            }catch (e:IndexOutOfBoundsException){}
             localPhotosViewModel.fetchLocalPhotos(lat, lon).observe(
                 viewLifecycleOwner, { photos ->
-                    photoLocalAdapter = PhotoLocalAdapter(activity!!,context!!, photos)
+                    photoLocalAdapter = PhotoLocalAdapter(requireActivity(),requireContext(), photos)
                     photoLocalRecyclerView.adapter = photoLocalAdapter
                     photoLocalRecyclerView.visibility = View.VISIBLE
                     progressBar.visibility = View.GONE

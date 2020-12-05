@@ -14,7 +14,7 @@ import com.abdullahalomair.flickerexplorer.model.Photo
 import java.util.concurrent.Executors
 
 private const val DATABASE_NAME = "likedPhoto-database"
-class FlickrRepository private constructor(context: Context){
+open class FlickrRepository private constructor(context: Context){
     private val database : FlickrDataBase = Room.databaseBuilder(
         context.applicationContext,
         FlickrDataBase::class.java,
@@ -35,14 +35,14 @@ class FlickrRepository private constructor(context: Context){
     }
     fun getLikedPhoto(id:String): LiveData<LikedPhotoDB?> = tasksDao.getLikedPhoto(id)
     fun getLikedPhotos(): LiveData<List<LikedPhotoDB>> = tasksDao.getLikedPhotos()
-    fun getLocalPhotos(lat:String, lon:String):LiveData<List<Photo>>{
-        return FlickrLocalFetcher(lat,lon).fetchLocalPhotos()
+    open fun getLocalPhotos(lat:String, lon:String):LiveData<List<Photo>>{
+        return FlickrLocalFetcher().fetchLocalPhotos(lat,lon)
     }
     fun getInterestingPhotos():LiveData<List<GalleryItem>> {
         return FlickrInterestingFetcher().fetchInterestingPhotos()
     }
     fun getPhotoComments(photoId:String): LiveData<List<Comment>>{
-        return FlickrCommentsFetcher(photoId).fetchPhotoComments()
+        return FlickrCommentsFetcher().fetchPhotoComments(photoId)
     }
 
     companion object {
@@ -54,7 +54,7 @@ class FlickrRepository private constructor(context: Context){
         }
         fun get(): FlickrRepository {
             return INSTANCE ?:
-            throw IllegalStateException("CrimeRepository must be initialized")
+            throw IllegalStateException("FlickrRepository must be initialized")
         }
     }
 }

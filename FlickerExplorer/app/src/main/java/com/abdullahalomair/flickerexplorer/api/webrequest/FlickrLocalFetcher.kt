@@ -7,36 +7,31 @@ import com.abdullahalomair.flickerexplorer.api.FlickrApi
 import com.abdullahalomair.flickerexplorer.api.FlickrLocalResponse
 import com.abdullahalomair.flickerexplorer.api.PhotoLocalResponse
 import com.abdullahalomair.flickerexplorer.api.exception.WrongLocationException
-import com.abdullahalomair.flickerexplorer.api.interceptors.PhotoInterceptor
 import com.abdullahalomair.flickerexplorer.model.Photo
-import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class FlickrLocalFetcher(private val lat:String,private val lon:String) {
+class FlickrLocalFetcher {
 
     private val flickrApi: FlickrApi
 
     init {
-        val client = OkHttpClient.Builder()
-            .addInterceptor(PhotoInterceptor(lat,lon))
-            .build()
+
         val retrofit: Retrofit = Retrofit.Builder()
             .baseUrl("https://api.flickr.com/")
             .addConverterFactory(GsonConverterFactory.create())
-            .client(client)
             .build()
 
         flickrApi = retrofit.create(FlickrApi::class.java)
     }
-    private fun fetchPhotosRequest(): Call<FlickrLocalResponse> {
-        return flickrApi.fetchLocalPhotos()
+    private fun fetchPhotosRequest(lat:String,lon:String): Call<FlickrLocalResponse> {
+        return flickrApi.fetchLocalPhotos(lat,lon)
     }
-    fun fetchLocalPhotos(): LiveData<List<Photo>> {
-        return fetchPhotoMetadata(fetchPhotosRequest())
+     fun fetchLocalPhotos(lat:String,lon:String): LiveData<List<Photo>> {
+        return fetchPhotoMetadata(fetchPhotosRequest(lat, lon))
     }
 
     private fun fetchPhotoMetadata(flickrRequest: Call<FlickrLocalResponse>)
@@ -50,7 +45,7 @@ class FlickrLocalFetcher(private val lat:String,private val lon:String) {
             ) {
                 val flickrResponse: FlickrLocalResponse? = response.body()
                 val photoResponse: PhotoLocalResponse? = flickrResponse?.photos
-                var photos: List<Photo> = photoResponse?.photoGalleryItem
+                val photos: List<Photo> = photoResponse?.photoGalleryItem
                     ?: mutableListOf()
                 responseLiveData.value = photos
             }

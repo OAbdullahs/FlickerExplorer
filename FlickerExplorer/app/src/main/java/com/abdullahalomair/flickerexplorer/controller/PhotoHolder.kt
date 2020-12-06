@@ -57,7 +57,7 @@ class PhotoHolder(view: View): RecyclerView.ViewHolder(view) {
 
     //Launch Activity
     private fun goToExpandedPhoto(url:String,id:String,title:String,isLiked: Boolean = false){
-        val intent = Intent(activity,DisplayPhoto::class.java)
+        val intent = Intent(activity,DisplayPhotoActivity::class.java)
         intent.putExtra(URL,url)
         intent.putExtra(PHOTO_ID,id)
         intent.putExtra(PHOTO_TITLE,title)

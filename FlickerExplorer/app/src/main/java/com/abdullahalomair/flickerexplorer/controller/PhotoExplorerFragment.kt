@@ -51,14 +51,19 @@ class PhotoExplorerFragment: Fragment() {
         progressBar = view.findViewById(R.id.explorer_progress)
         photosRecyclerView.layoutManager = GridLayoutManager(context, 3)
 
-       CoroutineScope(Dispatchers.Main).launch {
+
+       CoroutineScope(Dispatchers.IO).launch {
+          val allCitiesNames = getAllCitiesNames()
+           requireActivity().runOnUiThread {
            searchCityAdapter = ArrayAdapter(
-                   context!!,
+                   requireContext(),
                    R.layout.simple_dropdown_item,
-                   R.id.autoComplete, getAllCitiesNames()
+                   R.id.autoComplete, allCitiesNames
            )
            searchCityEditText.setAdapter(searchCityAdapter)
+           }
        }
+
 
 
 
@@ -67,7 +72,18 @@ class PhotoExplorerFragment: Fragment() {
 
         searchCityEditText.setOnItemClickListener { parent, _, position, _ ->
             val getCityName: String = parent.getItemAtPosition(position).toString()
-            displayPhotoBySearch(getCityName)
+            CoroutineScope(Dispatchers.IO).launch{
+                try {
+                 displayPhotoBySearch(getCityName)
+                }catch (e:IOException){
+                    requireActivity().runOnUiThread {
+                    Toast.makeText(
+                            requireContext(),
+                            requireContext().getText(R.string.error_in_grpc),
+                            Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
             searchCityEditText.text.clear()
             val imm = context?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager?
             imm?.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
@@ -77,7 +93,7 @@ class PhotoExplorerFragment: Fragment() {
         progressBar.visibility = View.VISIBLE
         photoExplorerViewModel.getInterestingPhotos().observe(
                 viewLifecycleOwner, { galleryItems ->
-            photoInterestingAdapter = PhotoInterestingAdapter(activity!!, context!!, galleryItems)
+            photoInterestingAdapter = PhotoInterestingAdapter(requireActivity(), requireContext(), galleryItems)
             photosRecyclerView.adapter = photoInterestingAdapter
             photosRecyclerView.visibility = View.VISIBLE
             progressBar.visibility = View.GONE
@@ -86,26 +102,27 @@ class PhotoExplorerFragment: Fragment() {
         return view
     }
 
-    private fun displayPhotoBySearch(getCityName:String){
-        val gc = Geocoder(context, Locale.getDefault())
+    private suspend fun displayPhotoBySearch(getCityName:String){
+        val gc = Geocoder(requireContext(), Locale.getDefault())
         val address: List<Address> = gc.getFromLocationName(getCityName, 1)
         if (address[0].hasLatitude() && address[0].hasLongitude()) {
             val longitude = address[0].longitude
             val latitude = address[0].latitude
-
-            photosRecyclerView.visibility = View.GONE
-            progressBar.visibility = View.VISIBLE
-            photoExplorerViewModel.getSearchedBasedPhotos(latitude.toString(), longitude.toString())
-                .observe(
-                    viewLifecycleOwner, { searchedPhotos ->
-                        activity?.title = getCityName
-                        photoInterestingAdapter =
-                            PhotoInterestingAdapter(activity!!, context!!, photos = searchedPhotos)
-                        photosRecyclerView.adapter = photoInterestingAdapter
-                        photosRecyclerView.visibility = View.VISIBLE
-                        progressBar.visibility = View.GONE
-                    }
-                )
+            requireActivity().runOnUiThread {
+                photosRecyclerView.visibility = View.GONE
+                progressBar.visibility = View.VISIBLE
+                photoExplorerViewModel.getSearchedBasedPhotos(latitude.toString(), longitude.toString())
+                        .observe(
+                                viewLifecycleOwner, { searchedPhotos ->
+                            activity?.title = getCityName
+                            photoInterestingAdapter =
+                                    PhotoInterestingAdapter(requireActivity(), requireContext(), photos = searchedPhotos)
+                            photosRecyclerView.adapter = photoInterestingAdapter
+                            photosRecyclerView.visibility = View.VISIBLE
+                            progressBar.visibility = View.GONE
+                        }
+                        )
+            }
         }
     }
 

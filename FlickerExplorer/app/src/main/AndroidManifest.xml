@@ -14,7 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FlickerExplorer">
-        <activity android:name=".controller.DisplayPhoto"></activity>
+        <activity android:name=".controller.DisplayPhotoActivity"/>
         <activity android:name=".controller.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

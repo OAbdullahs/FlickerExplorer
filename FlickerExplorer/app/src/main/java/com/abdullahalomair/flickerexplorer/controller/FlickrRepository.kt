@@ -14,7 +14,7 @@ import com.abdullahalomair.flickerexplorer.model.Photo
 import java.util.concurrent.Executors
 
 private const val DATABASE_NAME = "likedPhoto-database"
-open class FlickrRepository private constructor(context: Context){
+class FlickrRepository private constructor(context: Context){
     private val database : FlickrDataBase = Room.databaseBuilder(
         context.applicationContext,
         FlickrDataBase::class.java,
@@ -35,7 +35,7 @@ open class FlickrRepository private constructor(context: Context){
     }
     fun getLikedPhoto(id:String): LiveData<LikedPhotoDB?> = tasksDao.getLikedPhoto(id)
     fun getLikedPhotos(): LiveData<List<LikedPhotoDB>> = tasksDao.getLikedPhotos()
-    open fun getLocalPhotos(lat:String, lon:String):LiveData<List<Photo>>{
+    fun getLocalPhotos(lat:String, lon:String):LiveData<List<Photo>>{
         return FlickrLocalFetcher().fetchLocalPhotos(lat,lon)
     }
     fun getInterestingPhotos():LiveData<List<GalleryItem>> {

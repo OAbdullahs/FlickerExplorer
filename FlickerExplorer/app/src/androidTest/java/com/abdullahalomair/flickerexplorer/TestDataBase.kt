@@ -1,9 +1,12 @@
 package com.abdullahalomair.flickerexplorer
 
+import android.app.Application
 import android.content.Context
+import android.os.Build
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.abdullahalomair.flickerexplorer.controller.FlickrApplication
 import com.abdullahalomair.flickerexplorer.database.FlickrDataBase
 import com.abdullahalomair.flickerexplorer.database.LikedPhotoDB
 import com.abdullahalomair.flickerexplorer.database.LikedPhotoDao
@@ -41,8 +44,9 @@ class TestDataBase {
             photo_id = "123"
         )
         userDao.addPhoto(user)
-        val byName = userDao.getLikedPhoto("123")
-        assertThat(byName.value, equalTo(user))
+        val byName = LiveDataTestUtil.getValue(userDao.getLikedPhoto("123"))
+
+        assertThat(byName?.photo_id, equalTo(user.photo_id))
     }
 
 

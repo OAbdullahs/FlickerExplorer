@@ -14,7 +14,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-open class FlickrLocalFetcher {
+class FlickrLocalFetcher {
 
     private val flickrApi: FlickrApi
 
@@ -30,7 +30,7 @@ open class FlickrLocalFetcher {
     private fun fetchPhotosRequest(lat:String,lon:String): Call<FlickrLocalResponse> {
         return flickrApi.fetchLocalPhotos(lat,lon)
     }
-    open fun fetchLocalPhotos(lat:String,lon:String): LiveData<List<Photo>> {
+     fun fetchLocalPhotos(lat:String,lon:String): LiveData<List<Photo>> {
         return fetchPhotoMetadata(fetchPhotosRequest(lat, lon))
     }
 
@@ -45,7 +45,7 @@ open class FlickrLocalFetcher {
             ) {
                 val flickrResponse: FlickrLocalResponse? = response.body()
                 val photoResponse: PhotoLocalResponse? = flickrResponse?.photos
-                var photos: List<Photo> = photoResponse?.photoGalleryItem
+                val photos: List<Photo> = photoResponse?.photoGalleryItem
                     ?: mutableListOf()
                 responseLiveData.value = photos
             }

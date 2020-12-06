@@ -5,4 +5,6 @@
     <string name="search_hint">Enter the country name</string>
     <string name="no_liked_photos">You haven\'t liked any photo yet!!!</string>
     <string name="no_comment">There is no comment on this post!</string>
+    <string name="error_in_grpc">Ops, it seems there was an error getting the location
+        , please try again later</string>
 </resources>

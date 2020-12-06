@@ -9,4 +9,5 @@ data class LikedPhotoDB (@PrimaryKey val id: UUID = UUID.randomUUID(),
     var photo_id : String = "",
     var title : String = "",
     var url: String = "",
+
 )

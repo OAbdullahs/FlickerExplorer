@@ -17,7 +17,7 @@ private const val RADIUS_VALUE = "32"
 private const val RADIUS_UNITS = "radius_units"
 private const val KM = "km"
 private const val EXTRAS = "extras"
-private const val URLS = "url_c"
+private const val URLS = "url_c,geo"
 interface FlickrApi {
 
     @GET("services/rest?method=flickr.interestingness.getList" +

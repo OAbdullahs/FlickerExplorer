@@ -16,14 +16,11 @@ import com.abdullahalomair.flickerexplorer.model.Cities
 import com.abdullahalomair.flickerexplorer.model.Photo
 import com.abdullahalomair.flickerexplorer.viewmodel.PhotoExplorerFragmentViewModel
 import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.IOException
 import java.util.*
 
-
+private const val GOOGLE_MAP_FRAGMENT = "GoogleMapBottomSheet"
 class PhotoExplorerFragment : Fragment() {
     private lateinit var photoExplorerViewModel: PhotoExplorerFragmentViewModel
     private lateinit var searchCityEditText: AutoCompleteTextView
@@ -34,6 +31,7 @@ class PhotoExplorerFragment : Fragment() {
     private lateinit var googleSheet : GoogleMapBottomSheet
     private lateinit var photos: List<Photo>
     private lateinit var interestingPhotos: List<Photo>
+    private val scope = CoroutineScope(Dispatchers.IO)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +53,7 @@ class PhotoExplorerFragment : Fragment() {
         photosRecyclerView.layoutManager = GridLayoutManager(context, 3)
 
 
-        CoroutineScope(Dispatchers.IO).launch {
+        scope.launch {
             val allCitiesNames = getAllCitiesNames()
             withContext(Dispatchers.Main) {
                 searchCityAdapter = ArrayAdapter(
@@ -68,7 +66,7 @@ class PhotoExplorerFragment : Fragment() {
         }
         searchCityEditText.setOnItemClickListener { parent, _, position, _ ->
             val getCityName: String = parent.getItemAtPosition(position).toString()
-            CoroutineScope(Dispatchers.IO).launch {
+            scope.launch {
                 try {
                     displayPhotoBySearch(getCityName)
                 } catch (e: Exception) {
@@ -116,7 +114,7 @@ class PhotoExplorerFragment : Fragment() {
                     }else{
                         GoogleMapBottomSheet(interestingPhotos)
                     }
-                    googleSheet.show(requireActivity().supportFragmentManager,"Test")
+                    googleSheet.show(requireActivity().supportFragmentManager,GOOGLE_MAP_FRAGMENT)
                 }catch (e: Exception){
                     Toast.makeText(requireContext()
                         ,requireActivity().getText(R.string.wait_to_fetch)
@@ -128,7 +126,7 @@ class PhotoExplorerFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
-    private suspend fun displayPhotoBySearch(getCityName: String) {
+    private  fun displayPhotoBySearch(getCityName: String) {
         val gc = Geocoder(requireContext(), Locale.getDefault())
         val address: List<Address> = gc.getFromLocationName(getCityName, 1)
         if (address[0].hasLatitude() && address[0].hasLongitude()) {
@@ -161,7 +159,7 @@ class PhotoExplorerFragment : Fragment() {
         }
     }
 
-    private suspend fun getJsonDataFromAsset(fileName: String): String? {
+    private  fun getJsonDataFromAsset(fileName: String): String? {
         val jsonString: String
         try {
             jsonString =
@@ -180,6 +178,10 @@ class PhotoExplorerFragment : Fragment() {
         return allCities.cities
     }
 
+    override fun onStop() {
+        super.onStop()
+        scope.cancel()
+    }
 
     companion object {
         fun newInstance(): PhotoExplorerFragment {

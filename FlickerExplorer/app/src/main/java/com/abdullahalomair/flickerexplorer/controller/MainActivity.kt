@@ -171,7 +171,9 @@ class MainActivity : AppCompatActivity() {
         if(checkPermissions(this)){
             if (isLocationEnabled(this)){
                 mFusedLocationClient
-                    .lastLocation
+                    .getCurrentLocation(
+                        LocationRequest.PRIORITY_HIGH_ACCURACY, null
+                    )
                     .addOnCompleteListener { location ->
                         val result = location.result
                         if (result == null){

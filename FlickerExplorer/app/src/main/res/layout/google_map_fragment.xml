@@ -7,6 +7,14 @@
     android:layout_height="fill_parent"
     >
 
+    <ProgressBar
+        android:id="@+id/progress_bar_google_map"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
     <com.google.android.gms.maps.MapView
         android:id="@+id/google_map_view"
         android:layout_width="fill_parent"

@@ -5,19 +5,14 @@ import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.Toast
-import androidx.core.graphics.get
 import com.abdullahalomair.flickerexplorer.*
-import com.abdullahalomair.flickerexplorer.model.GalleryItem
 import com.abdullahalomair.flickerexplorer.model.Photo
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -35,8 +30,7 @@ import java.util.concurrent.ExecutionException
 
 
 class GoogleMapBottomSheet(
-    private val photosFromWeb: List<Photo> = emptyList(),
-    private val galleryItem:   List<GalleryItem> = emptyList()
+    private val photos: List<Photo> = emptyList()
 ) : BottomSheetDialogFragment(),
     OnMapReadyCallback,
     GoogleMap.OnMarkerClickListener {
@@ -84,82 +78,45 @@ class GoogleMapBottomSheet(
             googleMap.uiSettings.isMyLocationButtonEnabled = false
             googleMap.isMyLocationEnabled = true
             googleMap.setOnMarkerClickListener(this)
-             if (photosFromWeb.isNotEmpty()){
-                 markerDrawerForPhotos(photosFromWeb)
-             }else{
-                 markerDrawerForGalleryItem(galleryItem)
-             }
-        }
+            for (photo in photos) {
+                val lat = photo.latitude.toDouble()
+                val long = photo.longitude.toDouble()
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        val image: Bitmap = Glide.with(requireContext())
+                            .asBitmap()
+                            .load(photo.url)
+                            .apply(RequestOptions.bitmapTransform(CircleCrop()))
+                            .apply(RequestOptions().override(150, 150))
+                            .submit()
+                            .get()
+                        withContext(Dispatchers.Main) {
+                            val myLocation = LatLng(lat, long)
+                            googleMap.addMarker(
+                                MarkerOptions()
+                                    .position(myLocation)
+                                    .title(photo.title)
+                                    .icon(
+                                        BitmapDescriptorFactory.fromBitmap(image))
+                            )
+                        }
+                    } catch (e: Exception) {
 
-    }
-    private fun markerDrawerForPhotos(photos:List<Photo>){
-        for (photo in photos) {
-            val lat = photo.latitude.toDouble()
-            val long = photo.longitude.toDouble()
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    val image: Bitmap = Glide.with(requireContext())
-                        .asBitmap()
-                        .load(photo.url)
-                        .apply(RequestOptions.bitmapTransform(CircleCrop()))
-                        .apply(RequestOptions().override(150, 150))
-                        .submit()
-                        .get()
-                    withContext(Dispatchers.Main) {
-                        val myLocation = LatLng(lat, long)
-                        googleMap.addMarker(
-                            MarkerOptions()
-                                .position(myLocation)
-                                .title(photo.title)
-                                .icon(
-                                    BitmapDescriptorFactory.fromBitmap(image))
-                        )
                     }
-                } catch (e: ExecutionException) {
-
                 }
             }
-        }
-        val lat = photos[0].latitude.toDouble()
-        val long = photos[0].longitude.toDouble()
-        val imagePosition = LatLng(lat,long)
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(imagePosition, 10f))
-
-    }
-    private fun markerDrawerForGalleryItem(photos:List<GalleryItem>){
-        for (photo in photos) {
-            val lat = photo.latitude.toDouble()
-            val long = photo.longitude.toDouble()
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    val image: Bitmap = Glide.with(requireContext())
-                        .asBitmap()
-                        .load(photo.url)
-                        .apply(RequestOptions.bitmapTransform(CircleCrop()))
-                        .apply(RequestOptions().override(150, 150))
-                        .submit()
-                        .get()
-                    withContext(Dispatchers.Main) {
-                        val myLocation = LatLng(lat, long)
-                        googleMap.addMarker(
-                            MarkerOptions()
-                                .position(myLocation)
-                                .title(photo.title)
-                                .icon(
-                                    BitmapDescriptorFactory.fromBitmap(image))
-                        )
-                    }
-                } catch (e: ExecutionException) {
-
-                }
+            try {
+                val lat = photos[0].latitude.toDouble()
+                val long = photos[0].longitude.toDouble()
+                val imagePosition = LatLng(lat, long)
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(imagePosition, 10f))
+            }catch (e:IndexOutOfBoundsException){
+                dismiss()
             }
         }
-        val lat = photos[0].latitude.toDouble()
-        val long = photos[0].longitude.toDouble()
-        val imagePosition = LatLng(lat,long)
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(imagePosition, 10f))
 
     }
+
 
     override fun onResume() {
         googleMapView.onResume()
@@ -181,52 +138,36 @@ class GoogleMapBottomSheet(
         super.onLowMemory()
         googleMapView.onLowMemory()
     }
-    private fun goToExpandedPhoto(url:String,id:String,title:String){
+    private fun goToExpandedPhoto(lat:String,lon:String,url:String,id:String,title:String){
         val intent = Intent(requireActivity(),DisplayPhotoActivity::class.java)
         intent.putExtra(URL,url)
         intent.putExtra(PHOTO_ID,id)
         intent.putExtra(PHOTO_TITLE,title)
+        intent.putExtra(LAT, lat)
+        intent.putExtra(LON, lon)
         requireActivity().startActivity(intent)
     }
     override fun onMarkerClick(p0: Marker?): Boolean {
         val marker = p0?.position
         val lat = marker?.latitude
         val lon = marker?.longitude
-        if (photosFromWeb.isNotEmpty()){
-            lunchActivityFromPhotos(lat,lon,photosFromWeb)
-        }else{
-            lunchActivityFromGallery(lat,lon,galleryItem)
+        CoroutineScope(Dispatchers.Default).launch{
+            if (lat != null && lon !=null) {
+                for (photo in photos){
+                    val photoLat= photo.latitude.toDouble()
+                    val photoLon = photo.longitude.toDouble()
+                    if (lat == photoLat && lon == photoLon){
+                        withContext(Dispatchers.Main){
+                            goToExpandedPhoto(photo.latitude,
+                                photo.longitude,
+                                photo.url,
+                                photo.id,
+                                photo.title)
+                        }
+                    }
+                }
+            }
         }
         return true
-    }
-    private fun lunchActivityFromPhotos(lat:Double?,lon:Double?,photos:List<Photo>){
-        CoroutineScope(Dispatchers.Default).launch{
-            if (lat != null && lon !=null) {
-                for (photo in photos){
-                    val photoLat= photo.latitude.toDouble()
-                    val photoLon = photo.longitude.toDouble()
-                    if (lat == photoLat && lon == photoLon){
-                        withContext(Dispatchers.Main){
-                            goToExpandedPhoto(photo.url,photo.id,photo.title)
-                        }
-                    }
-                }
-            }
-        }
-    }
-    private fun lunchActivityFromGallery(lat:Double?,lon:Double?,photos:List<GalleryItem>){
-        CoroutineScope(Dispatchers.Default).launch{
-            if (lat != null && lon !=null) {
-                for (photo in photos){
-                    val photoLat= photo.latitude.toDouble()
-                    val photoLon = photo.longitude.toDouble()
-                    if (lat == photoLat && lon == photoLon){
-                        withContext(Dispatchers.Main){
-                            goToExpandedPhoto(photo.url,photo.id,photo.title)
-                        }
-                    }
-                }
-            }
-        }
     }
 }

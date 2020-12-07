@@ -4,17 +4,9 @@ import android.net.Uri
 import com.google.gson.annotations.SerializedName
 
 data class Photo (
-    val id : String,
-    val owner : String,
-    val secret : String,
-    val server : Int,
-    val farm : Int,
-    val title : String,
-    @SerializedName("geo_is_public") var geoIsPublic:Int = 0,
+    val id : String = "",
+    val title : String = "",
     var latitude:String = "",
     var longitude:String = "",
-    val ispublic : Int,
-    val isfriend : Int,
-    val isfamily : Int,
     @SerializedName("url_c") var url: String = "",
 )

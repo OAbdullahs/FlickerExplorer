@@ -4,7 +4,6 @@ import android.app.Activity
 import android.location.Address
 import android.location.Geocoder
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -14,7 +13,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.abdullahalomair.flickerexplorer.R
 import com.abdullahalomair.flickerexplorer.model.Cities
-import com.abdullahalomair.flickerexplorer.model.GalleryItem
 import com.abdullahalomair.flickerexplorer.model.Photo
 import com.abdullahalomair.flickerexplorer.viewmodel.PhotoExplorerFragmentViewModel
 import com.google.gson.Gson
@@ -35,7 +33,7 @@ class PhotoExplorerFragment : Fragment() {
     private lateinit var photoInterestingAdapter: PhotoInterestingAdapter
     private lateinit var googleSheet : GoogleMapBottomSheet
     private lateinit var photos: List<Photo>
-    private lateinit var interestingPhotos: List<GalleryItem>
+    private lateinit var interestingPhotos: List<Photo>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -116,7 +114,7 @@ class PhotoExplorerFragment : Fragment() {
                     googleSheet = if (interestingPhotos.isEmpty()) {
                         GoogleMapBottomSheet(photos)
                     }else{
-                        GoogleMapBottomSheet(galleryItem = interestingPhotos)
+                        GoogleMapBottomSheet(interestingPhotos)
                     }
                     googleSheet.show(requireActivity().supportFragmentManager,"Test")
                 }catch (e: Exception){

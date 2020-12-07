@@ -61,7 +61,7 @@ override fun onCreate(savedInstanceState: Bundle?) {
              val lon = bundle.getString(LON, "")
             try {
             activity?.title = getCityName(lat, lon)
-            }catch (e:IndexOutOfBoundsException){}
+            }catch (e:Exception){}
             localPhotosViewModel.fetchLocalPhotos(lat, lon).observe(
                 viewLifecycleOwner, { photos ->
                     localPhotos = photos

@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.ProgressBar
 import com.abdullahalomair.flickerexplorer.*
 import com.abdullahalomair.flickerexplorer.model.Photo
 import com.bumptech.glide.Glide
@@ -22,10 +23,7 @@ import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.util.concurrent.ExecutionException
 
 
@@ -36,6 +34,9 @@ class GoogleMapBottomSheet(
     GoogleMap.OnMarkerClickListener {
     private lateinit var googleMapView: MapView
     private lateinit var googleMap: GoogleMap
+    private lateinit var progressBar: ProgressBar
+    private val scope = CoroutineScope(Dispatchers.IO)
+    private val scopeDefault = CoroutineScope(Dispatchers.Default)
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
@@ -66,13 +67,17 @@ class GoogleMapBottomSheet(
     ): View? {
         val view = inflater.inflate(R.layout.google_map_fragment, container, false)
         googleMapView = view.findViewById(R.id.google_map_view)
+        progressBar = view.findViewById(R.id.progress_bar_google_map)
         googleMapView.onCreate(savedInstanceState)
         googleMapView.getMapAsync(this)
+        googleMapView.visibility = View.GONE
         return view
     }
 
     @SuppressLint("MissingPermission")
     override fun onMapReady(p0: GoogleMap?) {
+        progressBar.visibility = View.GONE
+        googleMapView.visibility = View.VISIBLE
         if (p0 != null) {
             googleMap = p0
             googleMap.uiSettings.isMyLocationButtonEnabled = false
@@ -81,7 +86,7 @@ class GoogleMapBottomSheet(
             for (photo in photos) {
                 val lat = photo.latitude.toDouble()
                 val long = photo.longitude.toDouble()
-                CoroutineScope(Dispatchers.IO).launch {
+                scope.launch {
                     try {
                         val image: Bitmap = Glide.with(requireContext())
                             .asBitmap()
@@ -132,6 +137,8 @@ class GoogleMapBottomSheet(
     override fun onDestroy() {
         super.onDestroy()
         googleMapView.onDestroy()
+        scope.cancel()
+        scopeDefault.cancel()
     }
 
     override fun onLowMemory() {
@@ -151,7 +158,7 @@ class GoogleMapBottomSheet(
         val marker = p0?.position
         val lat = marker?.latitude
         val lon = marker?.longitude
-        CoroutineScope(Dispatchers.Default).launch{
+        scopeDefault.launch{
             if (lat != null && lon !=null) {
                 for (photo in photos){
                     val photoLat= photo.latitude.toDouble()

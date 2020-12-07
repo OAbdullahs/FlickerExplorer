@@ -1,12 +1,9 @@
 package com.abdullahalomair.flickerexplorer
 
-import android.app.Application
 import android.content.Context
-import android.os.Build
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.abdullahalomair.flickerexplorer.controller.FlickrApplication
 import com.abdullahalomair.flickerexplorer.database.FlickrDataBase
 import com.abdullahalomair.flickerexplorer.database.LikedPhotoDB
 import com.abdullahalomair.flickerexplorer.database.LikedPhotoDao
@@ -14,6 +11,7 @@ import org.hamcrest.core.IsEqual.equalTo
 import org.junit.After
 import org.junit.Assert.assertThat
 import org.junit.Before
+
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException

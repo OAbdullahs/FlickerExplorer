@@ -7,4 +7,6 @@
     <string name="no_comment">There is no comment on this post!</string>
     <string name="error_in_grpc">Ops, it seems there was an error getting the location
         , please try again later</string>
+    <string name="google_maps_key">AIzaSyBK0Nl3BgdkX5dzJgD8Hu5j2kPtTUaJPxk</string>
+    <string name="wait_to_fetch">Please wait until the data downloads from the server!</string>
 </resources>

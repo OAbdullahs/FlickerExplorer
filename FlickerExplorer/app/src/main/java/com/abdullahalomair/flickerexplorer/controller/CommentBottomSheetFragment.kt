@@ -39,7 +39,7 @@ class CommentBottomSheetFragment(private val comments:List<Comment>)
             bottomSheetRecyclerView.visibility = View.VISIBLE
             noCommentTextView.visibility = View.GONE
             bottomSheetRecyclerView.layoutManager = LinearLayoutManager(context)
-            adapter = BottomSheetAdapter(context!!, comments)
+            adapter = BottomSheetAdapter(requireContext(), comments)
             bottomSheetRecyclerView.adapter = adapter
         }
 

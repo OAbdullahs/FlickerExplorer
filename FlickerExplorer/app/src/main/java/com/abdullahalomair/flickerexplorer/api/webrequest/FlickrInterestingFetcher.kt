@@ -6,7 +6,7 @@ import com.abdullahalomair.flickerexplorer.api.FlickrApi
 import com.abdullahalomair.flickerexplorer.api.FlickrInterestingResponse
 import com.abdullahalomair.flickerexplorer.api.PhotoInterestingResponse
 import com.abdullahalomair.flickerexplorer.api.exception.WrongUrlException
-import com.abdullahalomair.flickerexplorer.model.GalleryItem
+import com.abdullahalomair.flickerexplorer.model.Photo
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -28,12 +28,12 @@ class FlickrInterestingFetcher {
     private fun fetchPhotosRequest(): Call<FlickrInterestingResponse> {
         return flickrApi.fetchInterestingPhotos()
     }
-    fun fetchInterestingPhotos(): LiveData<List<GalleryItem>> {
+    fun fetchInterestingPhotos(): LiveData<List<Photo>> {
         return fetchPhotoMetadata(fetchPhotosRequest())
     }
     private fun fetchPhotoMetadata(flickrRequest: Call<FlickrInterestingResponse>)
-            : LiveData<List<GalleryItem>> {
-        val responseLiveData: MutableLiveData<List<GalleryItem>> = MutableLiveData()
+            : LiveData<List<Photo>> {
+        val responseLiveData: MutableLiveData<List<Photo>> = MutableLiveData()
 
         flickrRequest.enqueue(object : Callback<FlickrInterestingResponse> {
 
@@ -46,7 +46,7 @@ class FlickrInterestingFetcher {
             override fun onResponse(call: Call<FlickrInterestingResponse>, response: Response<FlickrInterestingResponse>) {
                 val flickrResponse: FlickrInterestingResponse? = response.body()
                 val photoResponse: PhotoInterestingResponse? = flickrResponse?.photos
-                var galleryItems: List<GalleryItem> = photoResponse?.galleryItems
+                var galleryItems: List<Photo> = photoResponse?.galleryItems
                     ?: mutableListOf()
                 galleryItems = galleryItems.filterNot {
                     it.url.isBlank()

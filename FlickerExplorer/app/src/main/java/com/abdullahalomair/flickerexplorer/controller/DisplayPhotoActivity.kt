@@ -9,15 +9,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModelProvider
-import com.abdullahalomair.flickerexplorer.PHOTO_ID
-import com.abdullahalomair.flickerexplorer.PHOTO_TITLE
-import com.abdullahalomair.flickerexplorer.R
-import com.abdullahalomair.flickerexplorer.URL
+import com.abdullahalomair.flickerexplorer.*
 import com.abdullahalomair.flickerexplorer.database.LikedPhotoDB
 import com.abdullahalomair.flickerexplorer.viewmodel.DisplayPhotoViewModel
 import com.bumptech.glide.Glide
 
 private const val SHEET_TAG = "BottomSheetDialogFragment"
+@Suppress("NAME_SHADOWING", "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class DisplayPhotoActivity : AppCompatActivity() {
     private val displayPhotoViewModel: DisplayPhotoViewModel by lazy {
         ViewModelProvider(this).get(DisplayPhotoViewModel::class.java)
@@ -27,6 +25,7 @@ class DisplayPhotoActivity : AppCompatActivity() {
     private lateinit var photoTitleTextView: TextView
     private lateinit var commentImageView: ImageView
     private lateinit var repliesCounterTextView: TextView
+
     private var filledFavorite = false
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +42,8 @@ class DisplayPhotoActivity : AppCompatActivity() {
         val photoUrl = intent.getStringExtra(URL)
         val photoId = intent.getStringExtra(PHOTO_ID)
         val photoTitle = intent.getStringExtra(PHOTO_TITLE)
+        val photoLat = intent.getStringExtra(LAT)
+        val photoLon = intent.getStringExtra(LON)
 
         //Change the attributes based on the values
         photoTitleTextView.text = photoTitle
@@ -70,7 +71,8 @@ class DisplayPhotoActivity : AppCompatActivity() {
                             likedPhoto.photo_id = photoId
                             likedPhoto.title = photoTitle
                             likedPhoto.url = photoUrl
-
+                            likedPhoto.latitude = photoLat
+                            likedPhoto.longitude = photoLon
                             likedPhoto(likedPhoto)
                         }
                         else{

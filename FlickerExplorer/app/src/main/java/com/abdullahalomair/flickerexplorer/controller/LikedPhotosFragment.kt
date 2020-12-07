@@ -1,9 +1,7 @@
 package com.abdullahalomair.flickerexplorer.controller
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -12,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.abdullahalomair.flickerexplorer.R
+import com.abdullahalomair.flickerexplorer.model.Photo
 import com.abdullahalomair.flickerexplorer.viewmodel.LikedPhotoFragmentViewModel
 
 class LikedPhotosFragment: Fragment() {
@@ -20,12 +19,14 @@ class LikedPhotosFragment: Fragment() {
     private lateinit var photoRecyclerView: RecyclerView
     private lateinit var progressBar: ProgressBar
     private lateinit var noLikedPhotoTextView: TextView
+    private  var photos: List<Photo> = emptyList()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         likedPhotoViewModel = ViewModelProvider(this)
             .get(LikedPhotoFragmentViewModel::class.java)
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(
@@ -46,7 +47,15 @@ class LikedPhotosFragment: Fragment() {
         likedPhotoViewModel.getPhotos().observe(
             viewLifecycleOwner,{ likedPhotos ->
                 if (likedPhotos.isNotEmpty()) {
-                    photoAdapter = LikedPhotoAdapter(activity!!, context!!, likedPhotos)
+                    for (photo in likedPhotos){
+                        val singlePhoto = Photo(photo.photo_id,
+                            photo.title,
+                            photo.latitude,
+                            photo.longitude,
+                            photo.url)
+                        photos += singlePhoto
+                    }
+                    photoAdapter = LikedPhotoAdapter(requireActivity(), requireContext(), likedPhotos)
                     photoRecyclerView.adapter = photoAdapter
                     photoRecyclerView.visibility = View.VISIBLE
                     progressBar.visibility = View.GONE
@@ -58,11 +67,32 @@ class LikedPhotosFragment: Fragment() {
         return view
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.google_map_menu,menu)
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.google_map_menu_item -> {
+                try {
+                    val googleSheet = GoogleMapBottomSheet(photos)
+                    googleSheet.show(requireActivity().supportFragmentManager,"Test")
+                }catch (e: Exception){
+                    Toast.makeText(requireContext()
+                        ,requireActivity().getText(R.string.wait_to_fetch)
+                        ,Toast.LENGTH_SHORT).show()
+                }
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onResume() {
         super.onResume()
         likedPhotoViewModel.getPhotos().observe(
             viewLifecycleOwner,{ likedPhotos ->
-                photoAdapter = LikedPhotoAdapter(activity!!,context!!,likedPhotos)
+                photoAdapter = LikedPhotoAdapter(requireActivity(),requireContext(),likedPhotos)
                 photoRecyclerView.adapter = photoAdapter
                 photoRecyclerView.visibility = View.VISIBLE
                 progressBar.visibility = View.GONE

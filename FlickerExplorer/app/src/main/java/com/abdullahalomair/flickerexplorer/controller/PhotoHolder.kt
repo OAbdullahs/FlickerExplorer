@@ -3,15 +3,12 @@ package com.abdullahalomair.flickerexplorer.controller
 
 import android.app.Activity
 import android.content.Intent
-import android.icu.text.CaseMap
-import android.provider.ContactsContract
+
 import android.view.View
 import android.widget.ImageView
-import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.abdullahalomair.flickerexplorer.*
 import com.abdullahalomair.flickerexplorer.database.LikedPhotoDB
-import com.abdullahalomair.flickerexplorer.model.GalleryItem
 import com.abdullahalomair.flickerexplorer.model.Photo
 import com.bumptech.glide.Glide
 
@@ -29,7 +26,7 @@ class PhotoHolder(view: View): RecyclerView.ViewHolder(view) {
         activity = getActivity
 
         imageView.setOnClickListener {
-            goToExpandedPhoto(photo.url,photo.id,photo.title)
+            goToExpandedPhoto(photo.latitude,photo.longitude,photo.url,photo.id,photo.title)
         }
     }
     //For Liked photos
@@ -40,28 +37,21 @@ class PhotoHolder(view: View): RecyclerView.ViewHolder(view) {
         activity = getActivity
 
         imageView.setOnClickListener {
-            goToExpandedPhoto(photo.url,photo.photo_id,photo.title,true)
+            goToExpandedPhoto(photo.latitude,photo.longitude,photo.url,photo.photo_id,photo.title,true)
         }
     }
 
-    //for Gallery Item
-    fun bind(getActivity: Activity,galleryItem: GalleryItem){
-        Glide.with(itemView).load(galleryItem.url)
-            .thumbnail(Glide.with(itemView).load(R.drawable.placeholder))
-            .into(imageView)
-        activity = getActivity
-        imageView.setOnClickListener {
-            goToExpandedPhoto(galleryItem.url,galleryItem.id,galleryItem.title)
-        }
-    }
+
 
     //Launch Activity
-    private fun goToExpandedPhoto(url:String,id:String,title:String,isLiked: Boolean = false){
+    private fun goToExpandedPhoto(lat:String,lon:String,url:String,id:String,title:String,isLiked: Boolean = false){
         val intent = Intent(activity,DisplayPhotoActivity::class.java)
         intent.putExtra(URL,url)
         intent.putExtra(PHOTO_ID,id)
         intent.putExtra(PHOTO_TITLE,title)
         intent.putExtra(IS_PHOTO_Liked, isLiked)
+        intent.putExtra(LAT, lat)
+        intent.putExtra(LON, lon)
         activity.startActivity(intent)
     }
 

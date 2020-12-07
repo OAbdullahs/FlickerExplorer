@@ -9,7 +9,6 @@ import com.abdullahalomair.flickerexplorer.api.webrequest.FlickrLocalFetcher
 import com.abdullahalomair.flickerexplorer.database.FlickrDataBase
 import com.abdullahalomair.flickerexplorer.database.LikedPhotoDB
 import com.abdullahalomair.flickerexplorer.model.Comment
-import com.abdullahalomair.flickerexplorer.model.GalleryItem
 import com.abdullahalomair.flickerexplorer.model.Photo
 import java.util.concurrent.Executors
 
@@ -38,7 +37,7 @@ class FlickrRepository private constructor(context: Context){
     fun getLocalPhotos(lat:String, lon:String):LiveData<List<Photo>>{
         return FlickrLocalFetcher().fetchLocalPhotos(lat,lon)
     }
-    fun getInterestingPhotos():LiveData<List<GalleryItem>> {
+    fun getInterestingPhotos():LiveData<List<Photo>> {
         return FlickrInterestingFetcher().fetchInterestingPhotos()
     }
     fun getPhotoComments(photoId:String): LiveData<List<Comment>>{

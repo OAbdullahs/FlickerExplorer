@@ -50,7 +50,6 @@ class FlickrCommentsFetcher {
                 val photoResponse: CommentResponse? = flickrResponse?.comments
                 val commentList: List<Comment> = photoResponse?.comment
                     ?: mutableListOf()
-                    Log.i(TAG,commentList.toString())
                 responseLiveData.value = commentList
             }
         })

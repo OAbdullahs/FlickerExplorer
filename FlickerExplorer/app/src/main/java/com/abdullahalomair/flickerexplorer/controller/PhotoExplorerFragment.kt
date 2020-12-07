@@ -17,6 +17,7 @@ import com.abdullahalomair.flickerexplorer.model.Photo
 import com.abdullahalomair.flickerexplorer.viewmodel.PhotoExplorerFragmentViewModel
 import com.google.gson.Gson
 import kotlinx.coroutines.*
+import okhttp3.Dispatcher
 import java.io.IOException
 import java.util.*
 
@@ -66,9 +67,12 @@ class PhotoExplorerFragment : Fragment() {
         }
         searchCityEditText.setOnItemClickListener { parent, _, position, _ ->
             val getCityName: String = parent.getItemAtPosition(position).toString()
+            photosRecyclerView.visibility = View.GONE
+            progressBar.visibility = View.VISIBLE
             scope.launch {
                 try {
                     displayPhotoBySearch(getCityName)
+
                 } catch (e: Exception) {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(
@@ -76,6 +80,8 @@ class PhotoExplorerFragment : Fragment() {
                             requireContext().getText(R.string.error_in_grpc),
                             Toast.LENGTH_SHORT
                         ).show()
+                        photosRecyclerView.visibility = View.VISIBLE
+                        progressBar.visibility = View.GONE
                     }
                 }
             }
@@ -126,13 +132,13 @@ class PhotoExplorerFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
-    private  fun displayPhotoBySearch(getCityName: String) {
+    private suspend  fun displayPhotoBySearch(getCityName: String) {
         val gc = Geocoder(requireContext(), Locale.getDefault())
         val address: List<Address> = gc.getFromLocationName(getCityName, 1)
         if (address[0].hasLatitude() && address[0].hasLongitude()) {
             val longitude = address[0].longitude
             val latitude = address[0].latitude
-            requireActivity().runOnUiThread {
+            withContext(Dispatchers.Main) {
                 photosRecyclerView.visibility = View.GONE
                 progressBar.visibility = View.VISIBLE
                 photoExplorerViewModel.getSearchedBasedPhotos(
